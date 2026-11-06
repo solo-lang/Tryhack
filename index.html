@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تسجيل الدخول | ليزر فورج CNC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f3;--surface:#fff;--ink:#0f1c27;--muted:#5b6b78;--line:#d3dae0;
+  --accent:#c4381d;--accent-ink:#fff;--accent-hover:#a92f17;--focus:#0f5f8a;
+  --danger:#b42318;--danger-bg:#fdecea;--ok:#127a46;--ok-bg:#e6f5ec;--shadow:0 1px 2px rgba(15,28,39,.06),0 24px 60px -24px rgba(15,28,39,.28);
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b141c;--surface:#131f29;--ink:#eaf0f4;--muted:#9aaab6;--line:#2b3a46;
+  --accent:#ff6a4a;--accent-ink:#1d0b06;--accent-hover:#ff825f;--focus:#6cc0ee;
+  --danger:#ff9b8f;--danger-bg:#3a1b18;--ok:#6fdca0;--ok-bg:#12301f;--shadow:0 24px 60px -24px rgba(0,0,0,.7);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b141c;--surface:#131f29;--ink:#eaf0f4;--muted:#9aaab6;--line:#2b3a46;
+  --accent:#ff6a4a;--accent-ink:#1d0b06;--accent-hover:#ff825f;--focus:#6cc0ee;
+  --danger:#ff9b8f;--danger-bg:#3a1b18;--ok:#6fdca0;--ok-bg:#12301f;--shadow:0 24px 60px -24px rgba(0,0,0,.7);color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.shell{display:grid;grid-template-columns:1.1fr 1fr;min-height:100%}
+
+/* ===== Machine side ===== */
+.stage{position:relative;overflow:hidden;color:#eaf0f4;display:flex;flex-direction:column;padding:36px clamp(28px,4.5vw,64px);
+  background:
+   radial-gradient(900px 500px at 85% 15%,rgba(255,106,74,.16),transparent 60%),
+   radial-gradient(700px 500px at 10% 100%,rgba(60,130,180,.18),transparent 60%),
+   linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px) 0 0/44px 44px,
+   linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/44px 44px,
+   linear-gradient(165deg,#13273a,#09131c)}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:21px}
+.brand svg{width:38px;height:38px;flex:none}
+.viz{position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:300px;margin:8px 0}
+.rig{width:100%;max-width:600px;display:block}
+.live{position:absolute;inset-inline-end:0;bottom:4%;width:244px;padding:14px 16px;border-radius:14px;
+  background:rgba(14,28,40,.72);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 18px 40px -12px rgba(0,0,0,.55)}
+.live-h{display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600}
+.status{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#7fe3ac;font-weight:500}
+.status i{width:8px;height:8px;border-radius:50%;background:#43d68a;animation:blink 1.4s ease-in-out infinite}
+.job{margin:8px 0 10px;font-size:13px;color:#b4c3cf}
+.bar{height:6px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#ff7a52,#ffb08a);animation:fill 8s linear infinite}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.kv div{font-size:11.5px;color:#9db0be;line-height:1.35}
+.kv b{display:block;font-size:14.5px;color:#fff;font-weight:600}
+.copy h2{margin:0 0 10px;font-size:clamp(26px,2.9vw,38px);line-height:1.3;font-weight:700;max-width:17em}
+.copy p{margin:0 0 22px;color:#aebdc9;max-width:32em}
+.trust{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);margin:0;list-style:none}
+.trust li{display:flex;flex-direction:column;gap:8px;font-size:13.5px;line-height:1.5;color:#c3d0da}
+.trust svg{width:26px;height:26px;color:#ff8a69}
+.trust b{display:block;color:#fff;font-weight:600;font-size:14.5px}
+.carriage{animation:travel 8s linear infinite}
+.cut{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 8s linear infinite}
+.glow{animation:pulse .45s ease-in-out infinite alternate}
+.sp{animation:spark .7s ease-out infinite;opacity:0}
+.sp:nth-child(2){animation-delay:.2s}.sp:nth-child(3){animation-delay:.4s}.sp:nth-child(4){animation-delay:.55s}
+@keyframes travel{0%{transform:translateX(150px)}75%{transform:translateX(390px)}90%{transform:translateX(390px)}100%{transform:translateX(150px)}}
+@keyframes draw{0%{stroke-dashoffset:1;opacity:1}75%,90%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes fill{0%{width:0}75%,90%{width:100%}100%{width:0}}
+@keyframes pulse{from{opacity:.7;r:8}to{opacity:1;r:13}}
+@keyframes spark{0%{opacity:1;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--dx),-26px)}}
+@keyframes blink{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.carriage,.cut,.glow,.sp,.bar i,.status i{animation:none}.carriage{transform:translateX(390px)}.cut{stroke-dashoffset:0}.bar i{width:70%}}
+
+/* ===== Form side ===== */
+.panel{display:flex;flex-direction:column;padding:24px clamp(20px,4vw,48px);
+  background:radial-gradient(600px 400px at 100% 0,color-mix(in srgb,var(--accent) 7%,transparent),transparent 70%),var(--bg)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14.5px}
+.back svg{width:16px;height:16px}
+html[dir=rtl] .back svg{transform:scaleX(-1)}
+.tools{display:flex;gap:8px}
+.chip{font:inherit;font-size:14px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer;min-height:36px}
+.chip:hover{color:var(--ink);border-color:var(--muted)}
+.center{flex:1;display:flex;align-items:center;justify-content:center;padding:20px 0}
+.box{width:100%;max-width:430px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:36px 34px 28px;box-shadow:var(--shadow)}
+.lock{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;margin-bottom:18px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.lock svg{width:24px;height:24px}
+h1{margin:0 0 6px;font-size:27px;line-height:1.3;font-weight:700}
+.sub{margin:0 0 24px;color:var(--muted);font-size:15.5px}
+.field{margin-bottom:16px}
+label{display:block;font-weight:600;font-size:15px;margin-bottom:6px}
+.control{position:relative}
+.ico{position:absolute;top:50%;transform:translateY(-50%);inset-inline-start:14px;width:20px;height:20px;color:var(--muted);pointer-events:none}
+input[type=email],input[type=password],input[type=text]{width:100%;height:50px;padding:0 14px;padding-inline-start:44px;font:inherit;color:var(--ink);text-align:start;unicode-bidi:plaintext;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;transition:border-color .15s,box-shadow .15s,background .15s}
+input::placeholder{color:color-mix(in srgb,var(--muted) 70%,transparent)}
+input:hover{border-color:var(--muted)}
+input:focus-visible{outline:none;background:var(--surface);border-color:var(--focus);box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 26%,transparent)}
+input[aria-invalid=true]{border-color:var(--danger)}
+.pw input{padding-inline-end:52px}
+.eye{position:absolute;top:50%;transform:translateY(-50%);inset-inline-end:5px;width:40px;height:40px;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;display:grid;place-items:center}
+.eye:hover{color:var(--ink)}
+.eye:focus-visible,.btn:focus-visible,.chip:focus-visible,a:focus-visible,.check input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.msg{min-height:20px;margin-top:5px;font-size:14px;color:var(--danger)}
+.caps{display:none;font-size:14px;color:var(--muted);margin-top:5px}.caps.show{display:block}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:2px 0 20px;flex-wrap:wrap}
+.check{display:flex;align-items:center;gap:8px;font-size:15px;cursor:pointer;margin:0;font-weight:400}
+.check input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+a{color:var(--focus);text-decoration:none;font-size:15px;font-weight:500}a:hover{text-decoration:underline}
+.btn{width:100%;height:52px;border:0;border-radius:10px;font:inherit;font-weight:700;font-size:17px;background:var(--accent);color:var(--accent-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 20px -8px color-mix(in srgb,var(--accent) 70%,transparent);transition:background .15s,transform .1s}
+.btn:hover{background:var(--accent-hover)}.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.8;cursor:progress}
+.spin{width:18px;height:18px;border:2.5px solid currentColor;border-top-color:transparent;border-radius:50%;animation:rot .7s linear infinite;display:none}
+.btn.loading .spin{display:block}
+@keyframes rot{to{transform:rotate(360deg)}}
+.alert{display:none;margin-bottom:16px;padding:12px 14px;border-radius:10px;font-size:15px}
+.alert.show{display:block}.alert.err{background:var(--danger-bg);color:var(--danger)}.alert.ok{background:var(--ok-bg);color:var(--ok)}
+.secure{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:18px;font-size:13.5px;color:var(--muted)}
+.secure svg{width:16px;height:16px;color:var(--ok)}
+.help{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:15px;text-align:center}
+.foot{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 20px;color:var(--muted);font-size:13px}
+.foot a{font-size:13px;color:var(--muted)}
+
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .stage{padding:18px 22px 4px}
+  .copy,.live{display:none}
+  .viz{min-height:0;margin:0}.rig{max-width:340px}
+  .box{padding:28px 22px 22px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="stage">
+  <div class="brand">
+    <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="9" fill="#ff6a4a"/><path d="M11 12h18M11 12v8m0 0h10m-10 0v8h18" stroke="#1a0c08" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span data-i="brand">ليزر فورج CNC</span>
+  </div>
+
+  <div class="viz">
+    <svg class="rig" viewBox="0 0 520 340" role="img" aria-label="ماكينة حفر بالليزر أثناء الحفر على لوح ألومنيوم">
+      <defs>
+        <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8aa0b0"/><stop offset=".5" stop-color="#4e6272"/><stop offset="1" stop-color="#2a3a47"/></linearGradient>
+        <linearGradient id="alu" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dbe4ea"/><stop offset=".55" stop-color="#a9b8c4"/><stop offset="1" stop-color="#7f909d"/></linearGradient>
+        <linearGradient id="head" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9fb2c0"/><stop offset=".5" stop-color="#eef3f6"/><stop offset="1" stop-color="#8197a7"/></linearGradient>
+        <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4d2e" stop-opacity=".95"/><stop offset="1" stop-color="#ffd2b8"/></linearGradient>
+        <radialGradient id="spot"><stop offset="0" stop-color="#fff6e0"/><stop offset=".35" stop-color="#ff8157"/><stop offset="1" stop-color="#ff4d2e" stop-opacity="0"/></radialGradient>
+        <pattern id="hex" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1.6" fill="#0a141c"/></pattern>
+        <filter id="blur"><feGaussianBlur stdDeviation="2.2"/></filter>
+      </defs>
+      <ellipse cx="260" cy="318" rx="230" ry="12" fill="#000" opacity=".35" filter="url(#blur)"/>
+      <!-- base and bed -->
+      <rect x="50" y="276" width="420" height="34" rx="8" fill="url(#steel)"/>
+      <rect x="70" y="268" width="380" height="12" rx="3" fill="#1b2a36"/>
+      <rect x="70" y="268" width="380" height="12" rx="3" fill="url(#hex)"/>
+      <circle cx="84" cy="293" r="3.5" fill="#c6d3dc"/><circle cx="436" cy="293" r="3.5" fill="#c6d3dc"/>
+      <rect x="186" y="288" width="148" height="10" rx="3" fill="#0e1a23"/><circle cx="202" cy="293" r="2.5" fill="#43d68a"/>
+      <!-- aluminum plate -->
+      <path d="M92 266L428 266L452 226L116 226Z" fill="url(#alu)"/>
+      <path d="M116 226L452 226" stroke="#fff" stroke-opacity=".7" stroke-width="1.5"/>
+      <g fill="none" stroke="#2a3a47" stroke-opacity=".55" stroke-width="2" stroke-linecap="round">
+        <path d="M150 234h46M206 234h22M146 258h58M214 258h36M330 234h60M320 258h28M358 258h44"/>
+        <circle cx="262" cy="246" r="9"/><path d="M257 246h10M262 241v10"/>
+      </g>
+      <!-- engraved line -->
+      <path class="cut" pathLength="1" d="M150 246H390" fill="none" stroke="#ff7a52" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- frame -->
+      <rect x="40" y="48" width="24" height="238" rx="5" fill="url(#steel)"/><rect x="456" y="48" width="24" height="238" rx="5" fill="url(#steel)"/>
+      <rect x="40" y="58" width="440" height="26" rx="5" fill="url(#steel)"/>
+      <path d="M72 71H448" stroke="#0e1a23" stroke-width="5" stroke-linecap="round"/>
+      <path d="M72 78H448" stroke="#c6d3dc" stroke-width="2" stroke-dasharray="1 6" stroke-linecap="round" opacity=".6"/>
+      <circle cx="52" cy="71" r="4" fill="#c6d3dc"/><circle cx="468" cy="71" r="4" fill="#c6d3dc"/>
+      <rect x="436" y="120" width="8" height="52" rx="3" fill="#0e1a23"/><circle cx="440" cy="132" r="2.5" fill="#ff6a4a"/><circle cx="440" cy="144" r="2.5" fill="#43d68a"/>
+      <!-- laser head -->
+      <g class="carriage">
+        <rect x="-26" y="62" width="52" height="30" rx="6" fill="url(#head)"/>
+        <rect x="-20" y="92" width="40" height="30" rx="5" fill="#33475a"/>
+        <g stroke="#7e95a6" stroke-width="2" stroke-linecap="round"><path d="M-14 99h28M-14 106h28M-14 113h28"/></g>
+        <rect x="-7" y="122" width="14" height="22" rx="3" fill="#c3d0da"/>
+        <path d="M-6 144h12l-3.5 12h-5z" fill="#4a5d6b"/>
+        <circle cx="16" cy="72" r="3" fill="#43d68a"/>
+        <line x1="0" y1="156" x2="0" y2="246" stroke="url(#beam)" stroke-width="2.6" stroke-linecap="round"/>
+        <circle class="glow" cx="0" cy="246" r="10" fill="url(#spot)"/>
+        <g fill="#ffd9a8"><circle class="sp" style="--dx:-12px" cx="0" cy="244" r="1.8"/><circle class="sp" style="--dx:14px" cx="0" cy="244" r="1.5"/><circle class="sp" style="--dx:-5px" cx="0" cy="244" r="1.3"/><circle class="sp" style="--dx:9px" cx="0" cy="244" r="1.6"/></g>
+      </g>
+    </svg>
+
+    <div class="live" aria-hidden="true">
+      <div class="live-h"><span data-i="m3">ماكينة 03</span><span class="status"><i></i><span data-i="run">قيد التشغيل</span></span></div>
+      <div class="job" data-i="job">حفر على لوح ألومنيوم 3 مم</div>
+      <div class="bar"><i></i></div>
+      <div class="kv">
+        <div><b>60W</b><span data-i="pow">القدرة</span></div>
+        <div><b>450</b><span data-i="spd">مم/ث</span></div>
+        <div><b>0.01</b><span data-i="prc">دقة مم</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="copy">
+    <h2 data-i="heroTitle">إدارة ماكينات الحفر والقص بالليزر بدقة واحترافية</h2>
+    <p data-i="heroText">سجّل دخولك لمتابعة الطلبات وملفات التصميم وجدول التشغيل وحالة الصيانة من لوحة واحدة.</p>
+    <ul class="trust">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg><span><b data-i="t1">اتصال مشفّر</b><span data-i="t1s">حماية كاملة لبياناتك وحسابك</span></span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span><b data-i="t2">متابعة لحظية</b><span data-i="t2s">حالة التشغيل وسجل الإنتاج</span></span></li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg><span><b data-i="t3">دعم فني مباشر</b><span data-i="t3s">فريق مختص لمساعدتك</span></span></li>
+    </ul>
+  </div>
+</aside>
+
+<main class="panel">
+  <div class="topbar">
+    <a class="back" href="#home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span data-i="back">العودة للموقع</span></a>
+    <div class="tools">
+      <button class="chip" id="theme" type="button">الوضع الداكن</button>
+      <button class="chip" id="lang" type="button" aria-label="Switch language">English</button>
+    </div>
+  </div>
+
+  <div class="center">
+    <div class="box">
+      <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+      <h1 data-i="title">تسجيل الدخول</h1>
+      <p class="sub" data-i="sub">ادخل بيانات حسابك للوصول إلى لوحة التحكم.</p>
+      <div id="alert" class="alert" role="alert" aria-live="assertive"></div>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="email" data-i="email">البريد الإلكتروني</label>
+          <div class="control">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg>
+            <input id="email" type="email" inputmode="email" autocomplete="username" placeholder="name@company.com" required>
+          </div>
+          <div class="msg" id="emailMsg" aria-live="polite"></div>
+        </div>
+        <div class="field">
+          <label for="password" data-i="password">كلمة المرور</label>
+          <div class="control pw">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+            <button class="eye" id="eye" type="button" aria-label="إظهار كلمة المرور"><svg id="eyeIcon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+          <div class="caps" id="caps" data-i="caps">زر Caps Lock مفعّل.</div>
+          <div class="msg" id="pwMsg" aria-live="polite"></div>
+        </div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="remember"><span data-i="remember">تذكّرني على هذا الجهاز</span></label>
+          <a href="#forgot" data-i="forgot">نسيت كلمة المرور؟</a>
+        </div>
+        <button class="btn" id="submit" type="submit"><span class="spin" aria-hidden="true"></span><span id="btnText" data-i="submit">تسجيل الدخول</span></button>
+      </form>
+
+      <div class="secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg><span data-i="secure">اتصالك مشفّر ومحمي</span></div>
+      <div class="help"><span data-i="noAccount">ليس لديك حساب؟</span> <a href="#request" data-i="request">اطلب حسابًا من فريق المبيعات</a></div>
+    </div>
+  </div>
+
+  <div class="foot"><span data-i="foot">© 2026 ليزر فورج CNC</span><a href="#privacy" data-i="privacy">سياسة الخصوصية</a><a href="#terms" data-i="terms">الشروط والأحكام</a><a href="#support" data-i="support">الدعم الفني</a></div>
+</main>
+</div>
+
+<script>
+(function(){
+  var T={
+    ar:{brand:"ليزر فورج CNC",m3:"ماكينة 03",run:"قيد التشغيل",job:"حفر على لوح ألومنيوم 3 مم",pow:"القدرة",spd:"مم/ث",prc:"دقة مم",
+      heroTitle:"إدارة ماكينات الحفر والقص بالليزر بدقة واحترافية",heroText:"سجّل دخولك لمتابعة الطلبات وملفات التصميم وجدول التشغيل وحالة الصيانة من لوحة واحدة.",
+      t1:"اتصال مشفّر",t1s:"حماية كاملة لبياناتك وحسابك",t2:"متابعة لحظية",t2s:"حالة التشغيل وسجل الإنتاج",t3:"دعم فني مباشر",t3s:"فريق مختص لمساعدتك",
+      back:"العودة للموقع",title:"تسجيل الدخول",sub:"ادخل بيانات حسابك للوصول إلى لوحة التحكم.",email:"البريد الإلكتروني",password:"كلمة المرور",
+      remember:"تذكّرني على هذا الجهاز",forgot:"نسيت كلمة المرور؟",submit:"تسجيل الدخول",loading:"جارٍ التحقق…",secure:"اتصالك مشفّر ومحمي",
+      noAccount:"ليس لديك حساب؟",request:"اطلب حسابًا من فريق المبيعات",foot:"© 2026 ليزر فورج CNC",privacy:"سياسة الخصوصية",terms:"الشروط والأحكام",support:"الدعم الفني",
+      caps:"زر Caps Lock مفعّل.",themeDark:"الوضع الداكن",themeLight:"الوضع الفاتح",langBtn:"English",
+      eRequired:"اكتب البريد الإلكتروني.",eInvalid:"البريد الإلكتروني غير صحيح. مثال: name@company.com",
+      pRequired:"اكتب كلمة المرور.",pShort:"كلمة المرور لا تقل عن 8 أحرف.",show:"إظهار كلمة المرور",hide:"إخفاء كلمة المرور",
+      ok:"تم تسجيل الدخول بنجاح. جارٍ تحويلك إلى لوحة التحكم…",fail:"تعذّر تسجيل الدخول. راجع البريد وكلمة المرور ثم حاول مرة أخرى.",pageTitle:"تسجيل الدخول | ليزر فورج CNC"},
+    en:{brand:"LaserForge CNC",m3:"Machine 03",run:"Running",job:"Engraving 3 mm aluminum plate",pow:"Power",spd:"mm/s",prc:"mm precision",
+      heroTitle:"Manage your laser engraving and cutting machines with precision",heroText:"Sign in to track orders, design files, machine schedules and maintenance status from one dashboard.",
+      t1:"Encrypted connection",t1s:"Your data and account stay protected",t2:"Live monitoring",t2s:"Machine status and production log",t3:"Direct support",t3s:"A specialist team to help you",
+      back:"Back to website",title:"Sign in",sub:"Enter your account details to open the dashboard.",email:"Email",password:"Password",
+      remember:"Keep me signed in on this device",forgot:"Forgot password?",submit:"Sign in",loading:"Checking…",secure:"Your connection is encrypted and protected",
+      noAccount:"No account yet?",request:"Request access from sales",foot:"© 2026 LaserForge CNC",privacy:"Privacy policy",terms:"Terms of use",support:"Support",
+      caps:"Caps Lock is on.",themeDark:"Dark mode",themeLight:"Light mode",langBtn:"العربية",
+      eRequired:"Enter your email.",eInvalid:"Enter a valid email, for example name@company.com",
+      pRequired:"Enter your password.",pShort:"Password must be at least 8 characters.",show:"Show password",hide:"Hide password",
+      ok:"Signed in. Redirecting to your dashboard…",fail:"Could not sign in. Check your email and password, then try again.",pageTitle:"Sign in | LaserForge CNC"}
+  };
+  var lang="ar",root=document.documentElement;
+  try{var s=localStorage.getItem("lf-lang");if(s==="en"||s==="ar")lang=s}catch(e){}
+  var $=function(id){return document.getElementById(id)};
+  var email=$("email"),pw=$("password"),form=$("form"),btn=$("submit"),alertBox=$("alert");
+
+  function isDark(){var t=root.getAttribute("data-theme");if(t)return t==="dark";return window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches}
+  function apply(){
+    var d=T[lang];root.lang=lang;root.dir=lang==="ar"?"rtl":"ltr";document.title=d.pageTitle;
+    document.querySelectorAll("[data-i]").forEach(function(el){var k=el.getAttribute("data-i");if(d[k])el.textContent=d[k]});
+    $("lang").textContent=d.langBtn;$("theme").textContent=isDark()?d.themeLight:d.themeDark;
+    $("eye").setAttribute("aria-label",pw.type==="password"?d.show:d.hide);
+    if(email.getAttribute("aria-invalid")==="true")checkEmail();
+    if(pw.getAttribute("aria-invalid")==="true")checkPw();
+  }
+  $("lang").addEventListener("click",function(){lang=lang==="ar"?"en":"ar";try{localStorage.setItem("lf-lang",lang)}catch(e){}apply()});
+  $("theme").addEventListener("click",function(){root.setAttribute("data-theme",isDark()?"light":"dark");apply()});
+
+  function setErr(i,m,t){m.textContent=t||"";if(t)i.setAttribute("aria-invalid","true");else i.removeAttribute("aria-invalid");return!t}
+  function checkEmail(){var v=email.value.trim(),d=T[lang];
+    if(!v)return setErr(email,$("emailMsg"),d.eRequired);
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v))return setErr(email,$("emailMsg"),d.eInvalid);
+    return setErr(email,$("emailMsg"),"")}
+  function checkPw(){var v=pw.value,d=T[lang];
+    if(!v)return setErr(pw,$("pwMsg"),d.pRequired);
+    if(v.length<8)return setErr(pw,$("pwMsg"),d.pShort);
+    return setErr(pw,$("pwMsg"),"")}
+  email.addEventListener("blur",function(){if(email.value)checkEmail()});
+  pw.addEventListener("blur",function(){if(pw.value)checkPw();$("caps").classList.remove("show")});
+  email.addEventListener("input",function(){if(email.getAttribute("aria-invalid"))checkEmail()});
+  pw.addEventListener("input",function(){if(pw.getAttribute("aria-invalid"))checkPw()});
+  pw.addEventListener("keyup",function(e){if(e.getModifierState)$("caps").classList.toggle("show",e.getModifierState("CapsLock"))});
+
+  $("eye").addEventListener("click",function(){
+    var show=pw.type==="password";pw.type=show?"text":"password";
+    $("eye").setAttribute("aria-label",show?T[lang].hide:T[lang].show);
+    $("eyeIcon").innerHTML=show
+      ?'<path d="M3 3l18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.9 8.3 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'
+      :'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>';
+  });
+
+  function showAlert(t,x){alertBox.className="alert show "+t;alertBox.textContent=x}
+
+  /* Replace with your real backend call, e.g.
+     fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:e,password:p,remember:r})}).then(function(r){return r.ok}) */
+  function login(e,p,r){return new Promise(function(res){setTimeout(function(){res(true)},1200)})}
+
+  form.addEventListener("submit",function(ev){
+    ev.preventDefault();alertBox.className="alert";
+    var a=checkEmail(),b=checkPw();
+    if(!a){email.focus();return}if(!b){pw.focus();return}
+    btn.disabled=true;btn.classList.add("loading");$("btnText").textContent=T[lang].loading;
+    login(email.value.trim(),pw.value,$("remember").checked)
+      .then(function(ok){showAlert(ok?"ok":"err",ok?T[lang].ok:T[lang].fail)})
+      .catch(function(){showAlert("err",T[lang].fail)})
+      .then(function(){btn.disabled=false;btn.classList.remove("loading");$("btnText").textContent=T[lang].submit});
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
